@@ -79,12 +79,12 @@ class W2P_Hook
         }
     }
 
-    public function get_same_previous_query(): null | W2P_query
+    public function get_same_previous_query(): null | W2P_Query
     {
 
         $formated_hook = $this->w2p_get_formated_hook();
 
-        $last_query_query = W2P_query::get_queries(
+        $last_query_query = W2P_Query::get_queries(
             false,
             [
                 "category" => $formated_hook["category"],

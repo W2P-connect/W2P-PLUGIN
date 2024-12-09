@@ -1,5 +1,5 @@
 <?php
-class W2P_query
+class W2P_Query
 {
     use W2P_SetterTrait;
     use W2P_Formater;
@@ -233,8 +233,8 @@ class W2P_query
 
             foreach ($ids as $id) {
                 $data
-                    ? $w2p_queries[] = (new W2P_query($id))->get_data()
-                    : $w2p_queries[] = new W2P_query($id);
+                    ? $w2p_queries[] = (new W2P_Query($id))->get_data()
+                    : $w2p_queries[] = new W2P_Query($id);
             }
 
             // Handle pagination
@@ -273,27 +273,27 @@ class W2P_query
         int $source_id,
         string $hook,
         array $payload = [],
-    ): W2P_query | bool {
-        $W2P_query = new W2P_query();
-        $W2P_query->setter('category', $category);
-        $W2P_query->setter('source', $source);
-        $W2P_query->setter('source_id', $source_id);
-        $W2P_query->setter('hook', $hook);
-        $W2P_query->setter('payload', $payload);
-        $W2P_query->setter('state', "TODO");
+    ): W2P_Query | bool {
+        $W2P_Query = new W2P_Query();
+        $W2P_Query->setter('category', $category);
+        $W2P_Query->setter('source', $source);
+        $W2P_Query->setter('source_id', $source_id);
+        $W2P_Query->setter('hook', $hook);
+        $W2P_Query->setter('payload', $payload);
+        $W2P_Query->setter('state', "TODO");
 
-        $W2P_query->update_additionnal_data("created_at", date("Y-m-d\TH:i:sP"));
+        $W2P_Query->update_additionnal_data("created_at", date("Y-m-d\TH:i:sP"));
 
 
         global $wpdb;
-        $wpdb->insert($W2P_query->db_name, $W2P_query->format_object_for_DB());
+        $wpdb->insert($W2P_Query->db_name, $W2P_Query->format_object_for_DB());
         if ($wpdb->last_error) {
             return false;
         } else {
             $id = $wpdb->insert_id;
-            $W2P_query->setter('id', $id);
-            $W2P_query->cancel_previous_query();
-            return $W2P_query;
+            $W2P_Query->setter('id', $id);
+            $W2P_Query->cancel_previous_query();
+            return $W2P_Query;
         }
     }
 
@@ -493,7 +493,7 @@ class W2P_query
      */
     public function cancel_previous_query()
     {
-        $queries = W2P_query::get_queries(
+        $queries = W2P_Query::get_queries(
             false,
             [
                 'state' => ["TODO", "ERROR"],

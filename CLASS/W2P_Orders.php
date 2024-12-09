@@ -30,7 +30,7 @@ function w2p_initialize_order_class()
                 try {
                     $data = parent::get_data();
 
-                    $data['queries'] = W2P_query::get_queries(
+                    $data['queries'] = W2P_Query::get_queries(
                         true,
                         [
                             'category' => W2P_CATEGORY["deal"],

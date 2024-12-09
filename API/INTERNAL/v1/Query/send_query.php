@@ -30,7 +30,7 @@ function w2p_send_query(WP_REST_Request $request)
 {
     try {
         $id = (int) $request->get_param("id");
-        $query = new W2P_query($id);
+        $query = new W2P_Query($id);
 
         if ($query->new_instance) {
             return new WP_REST_Response(

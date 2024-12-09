@@ -87,7 +87,7 @@ class W2P_User extends WP_User
 
     public function get_person_queries()
     {
-        return W2P_query::get_queries(
+        return W2P_Query::get_queries(
             true,
             [
                 'category' => W2P_CATEGORY["person"],
@@ -100,7 +100,7 @@ class W2P_User extends WP_User
     
     public function get_organization_queries()
     {
-        return W2P_query::get_queries(
+        return W2P_Query::get_queries(
             true,
             [
                 'category' => W2P_CATEGORY["organization"],

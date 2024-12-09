@@ -18,7 +18,7 @@ function w2p_get_queries($request)
 {
 
     try {
-        $queries = W2P_query::get_queries(
+        $queries = W2P_Query::get_queries(
             true,
             $request->get_params(),
             (int) $request->get_param('page') ?? 1,

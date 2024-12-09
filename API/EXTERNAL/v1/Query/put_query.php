@@ -33,7 +33,7 @@ function w2p_ext_put_query($request)
 {
     try {
         $id = (int) $request->get_param("id");
-        $query = new W2P_query((int) $id);
+        $query = new W2P_Query((int) $id);
 
         if ($query->new_instance) {
             return new WP_REST_Response(

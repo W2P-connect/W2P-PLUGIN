@@ -104,14 +104,14 @@ function w2p_sync_function($resync = false, $retry = false)
                         if ($query_payload == $formated_hook) {
                             $skip_next_query = true;
                             if ($organization_queries[0]["state"] !== "DONE") {
-                                $query = new W2P_query($organization_queries[0]["id"]);
+                                $query = new W2P_Query($organization_queries[0]["id"]);
                                 $query->send(true);
                             }
                         }
                     }
 
                     if (!$skip_next_query = false) {
-                        $query_obj = W2P_query::create_query(
+                        $query_obj = W2P_Query::create_query(
                             $formated_hook["category"],
                             $formated_hook["source"],
                             $formated_hook["source_id"],
@@ -138,14 +138,14 @@ function w2p_sync_function($resync = false, $retry = false)
                             $skip_next_query = true;
                             w2p_incremente_additional_data("total_person_uptodate");
                             if ($person_queries[0]["state"] !== "DONE") {
-                                $query = new W2P_query($person_queries[0]["id"]);
+                                $query = new W2P_Query($person_queries[0]["id"]);
                                 $query->send(true);
                             }
                         }
                     }
 
                     if (!$skip_next_query) {
-                        $query_obj = W2P_query::create_query(
+                        $query_obj = W2P_Query::create_query(
                             $formated_hook["category"],
                             $formated_hook["source"],
                             $formated_hook["source_id"],
@@ -214,14 +214,14 @@ function w2p_sync_function($resync = false, $retry = false)
                         if ($query_payload == $formated_payload) {
                             $skip_next_query = true;
                             if ($order_queries[0]["state"] !== "DONE") {
-                                $query = new W2P_query($order_queries[0]["id"]);
+                                $query = new W2P_Query($order_queries[0]["id"]);
                                 $query->send(true);
                             }
                         }
                     }
 
                     if (!$skip_next_query) {
-                        $query_obj = W2P_query::create_query(
+                        $query_obj = W2P_Query::create_query(
                             $formated_payload["category"],
                             $formated_payload["source"],
                             $formated_payload["source_id"],

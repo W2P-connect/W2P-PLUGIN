@@ -53,7 +53,7 @@ function w2p_show_front_app($atts = array(), $content = null, $tag = 'example_re
             "W2P_REQUIRED_FIELDS" => W2P_REQUIRED_FIELDS,
             "W2P_HOOK_LIST" => W2P_HOOK_LIST,
             "W2P_HOOK_SOURCES" => array_keys(W2P_HOOK_SOURCES),
-            "W2P_AVAIBLE_STATES" => W2P_query::$avaible_state,
+            "W2P_AVAIBLE_STATES" => W2P_Query::$avaible_state,
         ],
     ];
 
@@ -141,7 +141,7 @@ function w2p_send_queries()
             "total" => 0,
         ];
         foreach (array_keys(W2P_CATEGORY) as $category) { // toujours organization en premier pour l'envoyer à person
-            $queries = W2P_query::get_queries(
+            $queries = W2P_Query::get_queries(
                 false,
                 [
                     "state" => ["TODO", "ERROR"],

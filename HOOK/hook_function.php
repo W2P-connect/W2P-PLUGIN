@@ -344,7 +344,7 @@ function w2p_handle_custom_hook($hook, $args)
             }
 
 
-            $query = W2P_query::create_query(
+            $query = W2P_Query::create_query(
                 $formated_hook["category"],
                 $formated_hook["source"],
                 $formated_hook["source_id"],

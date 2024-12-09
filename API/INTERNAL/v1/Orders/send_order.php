@@ -52,7 +52,7 @@ function w2p_send_order(WP_REST_Request $request)
             if ($hook_obj) {
                 $formated_hook = $hook_obj->w2p_get_formated_hook();
 
-                $query_obj = W2P_query::create_query(
+                $query_obj = W2P_Query::create_query(
                     $formated_hook["category"],
                     $formated_hook["source"],
                     $formated_hook["source_id"],
@@ -93,7 +93,7 @@ function w2p_send_order(WP_REST_Request $request)
                 }
 
                 if ($query_to_sent) {
-                    $query_obj = new W2P_query($query_to_sent["id"]);
+                    $query_obj = new W2P_Query($query_to_sent["id"]);
                     $send_info = $query_obj->send(true);
 
                     return new WP_REST_Response(
