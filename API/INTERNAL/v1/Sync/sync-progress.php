@@ -37,7 +37,7 @@ function w2p_get_sync_progress()
             "last_heartbeat" => $last_heartbeat,
             "last_error" => $last_error,
             "sync_additional_datas" => $w2p_sync_additional_datas,
-            "wp_next_scheduled('w2p_send_queries')" => date('Y-m-d H:i:s', wp_next_scheduled('w2p_send_queries')),
+            "wp_next_scheduled('w2p_send_queries')" => gmdate("Y-m-d\TH:i:s\Z", wp_next_scheduled('w2p_send_queries')),
         ],
         200
     );

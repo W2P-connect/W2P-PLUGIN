@@ -282,7 +282,7 @@ class W2P_Query
         $W2P_Query->setter('payload', $payload);
         $W2P_Query->setter('state', "TODO");
 
-        $W2P_Query->update_additionnal_data("created_at", date("Y-m-d\TH:i:sP"));
+        $W2P_Query->update_additionnal_data("created_at", gmdate("Y-m-d\TH:i:s\Z"));
 
 
         global $wpdb;
@@ -399,7 +399,7 @@ class W2P_Query
             ]
         );
 
-        $this->update_additionnal_data("sended_at", date("Y-m-d\TH:i:sP"));
+        $this->update_additionnal_data("sended_at", gmdate("Y-m-d\TH:i:s\Z"));
 
         //Error from W2P Internal
         if ($response["status_code"] !== 201 && $response["status_code"] !== 200) {
@@ -447,7 +447,7 @@ class W2P_Query
             if ($traceback && is_array($traceback)) {
                 foreach ($traceback as $event) {
                     if (isset($event['step']) && isset($event["success"])) {
-                        $date = isset($event["createdAt"]) ? date("Y-m-d\TH:i:sP", strtotime($event["createdAt"])) : null;
+                        $date = isset($event["createdAt"]) ? gmdate("Y-m-d\TH:i:s\Z", strtotime($event["createdAt"])) : null;
 
                         $this->add_traceback(
                             $event['step'],
@@ -468,7 +468,7 @@ class W2P_Query
                 $this->cancel_previous_query();
             }
 
-            $this->update_additionnal_data("responded_at", date("Y-m-d\TH:i:sP"));
+            $this->update_additionnal_data("responded_at", gmdate("Y-m-d\TH:i:s\Z"));
             $this->setter("pipedrive_response", $pipedrive_response);
         }
 
@@ -939,7 +939,7 @@ class W2P_Query
         foreach ($traceback as &$existing_traceback) {
             if ($existing_traceback['step'] === $step) {
                 $existing_traceback = [
-                    "date" => $date ?? date("Y-m-d\TH:i:sP"),
+                    "date" => $date ?? gmdate("Y-m-d\TH:i:s\Z"),
                     "step" => $step,
                     "success" => $success,
                     "message" => $message,
@@ -953,7 +953,7 @@ class W2P_Query
 
         if (!$found) {
             $traceback[] = [
-                "date" => $date ?? date("Y-m-d\TH:i:sP"),
+                "date" => $date ?? gmdate("Y-m-d\TH:i:s\Z"),
                 "step" => $step,
                 "success" => $success,
                 "message" => $message,

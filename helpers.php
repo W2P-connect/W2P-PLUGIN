@@ -184,7 +184,7 @@ function w2p_add_error_log(string $message = 'No message', string $function = ''
         if (!is_writable(dirname($log_file))) {
             throw new Throwable("The log directory is not writable.");
         }
-        $log_entry = date('Y-m-d H:i:s ');
+        $log_entry = gmdate("Y-m-d\TH:i:s\Z");
         if ($function) {
             $log_entry .= "[$function] - ";
         }
