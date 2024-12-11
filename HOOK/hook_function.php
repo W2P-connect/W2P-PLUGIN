@@ -283,8 +283,7 @@ function w2p_get_order_value($order, $value)
     }
 }
 
-
-
+//Gestion un peu étrange, gestion de la source ID ici et dans w2p_register_user_defined_hooks
 function w2p_handle_custom_hook($hook, $args)
 {
     try {
@@ -337,9 +336,9 @@ function w2p_handle_custom_hook($hook, $args)
             $transient_key = 'w2p_hook_' . md5($formated_hook["category"] . '_' . $formated_hook["source"] . '_' . $formated_hook["source_id"] . '_' . $formated_hook["label"]);
             $previous_data = get_transient($transient_key);
 
-            
+
             if ($hook_obj->get_same_previous_query()) {
-                w2p_add_error_log("Nothing to update for the source id $hook[source_id] of the category $hook[category] (last query were the same)", 'w2p_register_user_defined_hooks');
+                w2p_add_error_log("$hook_key : Nothing to update for the source id $source_id of the category $hook[category] (last query were the same)", 'w2p_register_user_defined_hooks');
                 return;
             }
 
@@ -411,49 +410,90 @@ function w2p_register_user_defined_hooks()
                 if ($reference !== null) {
                     $hook = array_merge($hook, $reference);
 
-
-                    // Définir la priorité en fonction de la catégorie
-                    $priority = match ($category) {
-                        'organization' => 100,
-                        'person'       => 105,
-                        'deal'         => 110,
-                        default        => 10,
-                    };
+                    $priority = W2P_HOOK_PRIORITY[$category];
 
                     if ($hook_key === "woocommerce_cart_updated") {
                         add_action(
                             'woocommerce_add_to_cart',
-                            function ($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data) use ($hook) {
-                                w2p_handle_add_to_cart($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data, $hook);
+                            function () use ($hook) {
+                                if (get_current_user_id()) {
+                                    $order_id = w2p_get_current_checkout_order_id();
+                                    $order_id &&
+                                        w2p_handle_cart_updated(
+                                            array_merge(
+                                                $hook,
+                                                [
+                                                    "label" => "Product added to cart",
+                                                    "key" => "woocommerce_add_to_cart",
+                                                    "source" => "order",
+                                                ]
+                                            ),
+                                            $order_id
+                                        );
+                                }
                             },
                             $priority,
-                            6
                         );
                         add_action(
                             'woocommerce_after_cart_item_quantity_update',
-                            function ($cart_item_key, $quantity, $old_quantity, $cart_item) use ($hook) {
-                                w2p_handle_cart_item_update($cart_item_key, $quantity, $old_quantity, $cart_item, $hook);
+                            function () use ($hook) {
+                                if (get_current_user_id()) {
+                                    $order_id = w2p_get_current_checkout_order_id();
+                                    $order_id &&
+                                        w2p_handle_cart_updated(
+                                            array_merge(
+                                                $hook,
+                                                [
+                                                    "label" => "Product quantity updated from cart",
+                                                    "key" => "woocommerce_after_cart_item_quantity_update",
+                                                    "source" => "order",
+                                                ]
+                                            ),
+                                            $order_id,
+                                        );
+                                }
                             },
                             $priority,
-                            4
                         );
                         add_action(
                             'woocommerce_remove_cart_item',
-                            function ($cart_item_key) use ($hook) {
-                                w2p_handle_cart_item_remove($cart_item_key, $hook);
+                            function () use ($hook) {
+                                if (get_current_user_id()) {
+                                    $order_id =  w2p_get_current_checkout_order_id();
+                                    $order_id &&
+                                        w2p_handle_cart_updated(
+                                            array_merge(
+                                                $hook,
+                                                [
+                                                    "label" => "Product removed from cart",
+                                                    "key" => "woocommerce_remove_cart_item",
+                                                    "source" => "order",
+                                                ]
+                                            ),
+                                            $order_id
+                                        );
+                                }
                             },
                             $priority,
-                            1
                         );
                     } else {
-                        // Enregistrer chaque hook avec une priorité spécifique
-                        add_action($hook_key, function ($entity_id) use ($hook) {
-                            w2p_handle_custom_hook($hook, $entity_id,);
+                        add_action($hook_key, function ($entity_id) use ($hook, $hook_key) {
+
+                            if ($hook_key === "woocommerce_update_order") {
+                                $disabled = get_transient("disable_hook_update_order_$entity_id");
+                                if ($disabled) {
+                                    set_transient("fired_woocommerce_update_ order_from_card_$entity_id", false);
+                                } else {
+                                    w2p_handle_custom_hook($hook, $entity_id);
+                                }
+                            } else {
+                                w2p_handle_custom_hook($hook, $entity_id);
+                            }
                         }, $priority, 1);
                         if (isset($hook["linked_hooks"])) {
                             foreach ($hook["linked_hooks_key"] as $linked_hook_key) {
                                 add_action($linked_hook_key, function ($entity_id) use ($hook) {
-                                    w2p_handle_custom_hook($hook, $entity_id,);
+                                    w2p_handle_custom_hook($hook, $entity_id);
                                 }, $priority, 1);
                             }
                         }
@@ -466,60 +506,123 @@ function w2p_register_user_defined_hooks()
     }
 }
 
+add_action('w2p_check_last_woocommerce_update_order', 'w2p_check_last_woocommerce_update_order_handler', 10, 3);
+function w2p_check_last_woocommerce_update_order_handler($hook, $order_id, $iteration)
+{
+    try {
+        // if ($hook["key"] === "woocommerce_add_to_cart" && $cart) {
+        // }
+
+        $last_iteration = get_transient("last_iteration_fired_woocommerce_update_order_from_card_$order_id");
+        if ($last_iteration == $iteration) {
+            w2p_handle_custom_hook(
+                $hook,
+                $order_id,
+            );
+            set_transient("last_iteration_fired_woocommerce_update_order_from_card_$order_id", 0, 10);
+        }
+    } catch (Throwable $e) {
+        w2p_add_error_log("Error handling wart update " . $e->getMessage(), "w2p_check_last_woocommerce_update_order_handler");
+    }
+}
+
+function w2p_update_order_from_cart($order_id, $update_items = false)
+{
+    try {
+        $order = wc_get_order($order_id);
+        $cart = WC()->cart->get_cart();
+        if ($order && $cart) {
+            $order->set_cart_hash(WC()->cart->get_cart_hash());
+
+            if ($update_items) {
+                foreach ($order->get_items() as $item_id => $item) {
+                    $order->remove_item($item_id);
+                }
+
+                // 3. Ajoute les produits du panier comme items de la commande
+                foreach ($cart as $cart_item_key => $cart_item) {
+                    $product = wc_get_product($cart_item['product_id']);
+                    if ($product) {
+                        $item = new WC_Order_Item_Product();
+                        $item->set_product($product); // Associe le produit à l'item
+                        $item->set_quantity($cart_item['quantity']);
+                        $item->set_subtotal($cart_item['line_subtotal']);
+                        $item->set_total($cart_item['line_total']);
+                        $order->add_item($item); // Ajoute l'item à la commande
+                    }
+                }
+            }
+            $order->save();
+        }
+
+        return true;
+    } catch (Throwable $e) {
+        w2p_add_error_log("Error updating order from cart: " . $e->getMessage(), "w2p_update_order_from_cart");
+        return false;
+    }
+}
+function w2p_handle_cart_updated($hook, $order_id)
+{
+    try {
+
+        set_transient("disable_hook_update_order_$order_id", true, 60);
+        $iteration = did_action("woocommerce_update_order");
+        set_transient("last_iteration_fired_woocommerce_update_order_from_card_$order_id", $iteration, 10);
+
+        if (!wp_next_scheduled('w2p_check_last_woocommerce_update_order', array($hook, $order_id, $iteration))) {
+            wp_schedule_single_event(
+                time() + 2,
+                'w2p_check_last_woocommerce_update_order',
+                array($hook, $order_id, $iteration)
+            );
+        }
+
+        w2p_update_order_from_cart(
+            $order_id,
+            $hook["key"] === "woocommerce_add_to_cart"
+        );
+
+        $next_event = wp_get_scheduled_event('w2p_check_last_woocommerce_update_order', array($hook, $order_id, $iteration));
+        if (!$next_event) {
+            w2p_add_error_log("No scheduled event for w2p_check_last_woocommerce_update_order", "w2p_handle_cart_updated");
+        }
+    } catch (Throwable $e) {
+        w2p_add_error_log("Error in handling cart update: " . $e->getMessage(), "w2p_handle_cart_updated");
+        w2p_add_error_log('Parameters passed: ' . print_r(compact('hook', 'order_id'), true), 'w2p_handle_cart_updated');
+    }
+}
+
+
+function w2p_get_current_checkout_order_id()
+{
+    try {
+        if (get_current_user_id()) {
+            $order_id = WC()->session->get("store_api_draft_order") ?? WC()->session->get("order_awaiting_payment") ?? 0;
+
+            if (!$order_id || !wc_get_order($order_id)) {
+                $checkout = new WC_Checkout();
+                $order_id = $checkout->create_order([]);
+                WC()->session->set("store_api_draft_order", $order_id);
+
+                $order = wc_get_order($order_id);
+                if ($order) {
+                    $order->set_status('pending');
+                    $order->set_cart_hash(WC()->cart->get_cart_hash());
+                    $order->set_customer_id(get_current_user_id());
+                    $order->update_meta_data('_created_via', 'w2p_custom_process');
+                    $order->save();
+
+                    WC()->session->set('order_awaiting_payment', $order_id);
+                }
+            }
+
+            return $order_id;
+        }
+    } catch (Throwable $e) {
+        w2p_add_error_log("Error while getting order_id: " . $e->getMessage(), "w2p_manage_cart_and_order");
+        return null;
+    }
+}
 
 
 w2p_register_user_defined_hooks();
-
-function w2p_handle_add_to_cart($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data, $hook)
-{
-    w2p_handle_custom_hook(
-        array_merge($hook, ["label" => "Product added to cart", "key" => "woocommerce_add_to_cart"]),
-        $variation_id ? $variation_id :  $product_id,
-    );
-}
-
-function w2p_handle_cart_item_update($cart_item_key, $quantity, $old_quantity, $cart_item, $hook)
-{
-    try {
-        $cart = WC()->cart->get_cart();
-
-        if ($quantity !== $old_quantity) {
-            if (isset($cart[$cart_item_key])) {
-                // Récupérer les informations du produit
-                $cart_item = $cart[$cart_item_key];
-                $product_id = $cart_item['product_id']; // ID du produit
-                $variation_id = $cart_item['variation_id']; // ID de la variation (0 si ce n'est pas une variation)
-
-                w2p_handle_custom_hook(
-                    array_merge($hook, ["label" => "Product quantity updated from cart", "key" => "woocommerce_after_cart_item_quantity_update"]),
-                    $variation_id ? $variation_id :  $product_id,
-                );
-            }
-        }
-    } catch (Throwable $e) {
-        w2p_add_error_log("Error in handling cart item update: " . $e->getMessage(), "w2p_handle_cart_item_update");
-        w2p_add_error_log('Parameters passed: ' . print_r(compact('hook', 'cart_item_key', 'quantity', 'old_quantity', 'product_id', 'variation_id'), true), 'w2p_handle_cart_item_update');
-    }
-}
-
-function w2p_handle_cart_item_remove($cart_item_key, $hook)
-{
-    try {
-        $cart = WC()->cart->get_cart();
-
-        if (isset($cart[$cart_item_key])) {
-            // Récupérer les informations du produit
-            $cart_item = $cart[$cart_item_key];
-            $product_id = $cart_item['product_id']; // ID du produit
-            $variation_id = $cart_item['variation_id']; // ID de la variation (0 si ce n'est pas une variation)
-
-            w2p_handle_custom_hook(
-                array_merge($hook, ["label" => "Product removed from cart", "key" => "woocommerce_remove_cart_item"]),
-                $variation_id ? $variation_id :  $product_id,
-            );
-        }
-    } catch (Throwable $e) {
-        w2p_add_error_log("Error in handling cart item removal: " . $e->getMessage(), "w2p_handle_cart_item_remove");
-        w2p_add_error_log('Parameters passed: ' . print_r(compact('hook', 'cart_item_key', 'product_id', 'variation_id'), true), 'w2p_handle_cart_item_remove');
-    }
-}
