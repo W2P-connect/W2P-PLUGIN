@@ -251,7 +251,7 @@ function w2p_is_sync_running()
     return $is_sync_running;
 }
 
-function w2P_curl_request(string $url, string $method, array $data = array())
+function W2P_curl_request(string $url, string $method, array $data = array())
 {
     try {
         $ch = curl_init();
@@ -290,9 +290,9 @@ function w2P_curl_request(string $url, string $method, array $data = array())
         curl_close($ch);
         return $response;
     } catch (\Throwable $e) {
-        w2p_add_error_log("Curl request failed: " . $e->getMessage(), "w2P_curl_request");
-        w2p_add_error_log("URL: $url", "w2P_curl_request");
-        w2p_add_error_log("Method: $method", "w2P_curl_request");
+        w2p_add_error_log("Curl request failed: " . $e->getMessage(), "W2P_curl_request");
+        w2p_add_error_log("URL: $url", "W2P_curl_request");
+        w2p_add_error_log("Method: $method", "W2P_curl_request");
 
         // Retour structuré en cas d'erreur
         return [
