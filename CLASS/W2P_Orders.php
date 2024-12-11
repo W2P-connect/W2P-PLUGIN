@@ -30,7 +30,7 @@ function w2p_initialize_order_class()
                 try {
                     $data = parent::get_data();
 
-                    $data['queries'] = W2P_Query::get_queries(
+                    $queries = W2P_Query::get_queries(
                         true,
                         [
                             'category' => W2P_CATEGORY["deal"],
@@ -40,9 +40,10 @@ function w2p_initialize_order_class()
                         -1
                     )["data"];
 
+                    $data["queries"] = $queries;
                     $data["products"] = $this->get_products();
-                    $data['state'] = $this->get_state($data['queries']);
-                    $data['deal_id'] = 1923;
+                    $data['state'] = $this->get_state($queries);
+                    $data['deal_id'] = isset($queries[0]) ? $queries[0]['target_id'] : null;
                     $currency = get_option('woocommerce_currency');
                     $data["currency_symbol"] = get_woocommerce_currency_symbol($currency);
 
