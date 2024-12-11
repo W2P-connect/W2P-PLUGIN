@@ -387,7 +387,7 @@ class W2P_Query
             "The query is ready to be sent"
         );
 
-        $response = w2P_curl_request(
+        $response = W2P_curl_request(
             W2P_DISTANT_REST_URL . "/query",
             "POST",
             [
@@ -512,7 +512,7 @@ class W2P_Query
                 $query->add_traceback(
                     "Request Cancellation",
                     false,
-                    "Your request has been canceled because a more recent update has already been sent to Pipedrive."
+                    "Your request has been canceled because a more recent request has already been created or sent to Pipedrive."
                 );
                 $query->cancel();
             }
