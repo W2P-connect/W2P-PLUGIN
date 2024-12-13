@@ -876,7 +876,7 @@ class W2P_Query
             ? $additional_data["traceback"]
             : [];
 
-        foreach ($traceback as $trace) {
+        foreach (array_reverse($traceback) as $trace) {
             if (isset($trace["success"]) && $trace["success"] === false) {
                 $last_error = $trace["message"];
                 break;
