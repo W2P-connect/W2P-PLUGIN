@@ -2,7 +2,7 @@
 
 
 if (!defined("W2P_DISTANT_REST_URL")) {
-    define("W2P_DISTANT_REST_URL", "https://w2p-website.vercel.app/api/v1");
+    define("W2P_DISTANT_REST_URL", "https://woocommerce-to-pipedrive.com/api/v1");
 }
 
 if (!defined("W2P_VARIABLE_SOURCES")) {
