@@ -1,15 +1,15 @@
 <?php
 
 /**
- * @package First_Plugin
- * @version 1.0.0
+ * @package W2P
+ * @version 1.0.1
  */
 /*
 Plugin Name: W2P - Woocomerce to Pipedrive
 Plugin URI: https://woocommerce-to-pipedrive.com/
 Description: Permet de syncroniser unidirectionnelement vos informations CRM de Woocommerce à Pipedrive
 Author: Tristan Dieny
-Version: 1.0
+Version: 1.0.1
 Author URI: https://github.com/W2P-connect/W2P-PLUGIN
 Requires PHP: 8.0
 */
