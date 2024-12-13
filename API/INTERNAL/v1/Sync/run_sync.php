@@ -250,7 +250,7 @@ function w2p_sync_function($resync = false, $retry = false)
             }
 
             update_option("w2p_sync_running", false);
-            update_option("w2p_last_sync", date("d M Y H:i:s"));
+            update_option("w2p_last_sync", gmdate("Y-m-d\TH:i:s\Z"));
 
             wp_clear_scheduled_hook('w2p_cron_check_sync');
 

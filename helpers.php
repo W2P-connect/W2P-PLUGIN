@@ -182,13 +182,13 @@ function w2p_add_error_log(string $message = 'No message', string $function = ''
         $log_file = plugin_dir_path(__FILE__) . 'error_log.log';
 
         if (!is_writable(dirname($log_file))) {
-            throw new Throwable("The log directory is not writable.");
+            throw new Exception("The log directory is not writable.");
         }
-        $log_entry = date('Y-m-d H:i:s ');
+        $log_entry = gmdate("Y-m-d\TH:i:s\Z");
         if ($function) {
-            $log_entry .= "[$function] - ";
+            $log_entry .= "[$function] -";
         }
-        $log_entry .= $message . "\n";
+        $log_entry .= " $message\n";
         error_log($log_entry, 3, $log_file);
     } catch (Throwable $e) {
         w2p_add_error_log("Error: " . $e->getMessage(), "w2p_add_error_log");
@@ -251,7 +251,7 @@ function w2p_is_sync_running()
     return $is_sync_running;
 }
 
-function w2P_curl_request(string $url, string $method, array $data = array())
+function W2P_curl_request(string $url, string $method, array $data = array())
 {
     try {
         $ch = curl_init();
@@ -290,9 +290,9 @@ function w2P_curl_request(string $url, string $method, array $data = array())
         curl_close($ch);
         return $response;
     } catch (\Throwable $e) {
-        w2p_add_error_log("Curl request failed: " . $e->getMessage(), "w2P_curl_request");
-        w2p_add_error_log("URL: $url", "w2P_curl_request");
-        w2p_add_error_log("Method: $method", "w2P_curl_request");
+        w2p_add_error_log("Curl request failed: " . $e->getMessage(), "W2P_curl_request");
+        w2p_add_error_log("URL: $url", "W2P_curl_request");
+        w2p_add_error_log("Method: $method", "W2P_curl_request");
 
         // Retour structuré en cas d'erreur
         return [
@@ -336,21 +336,21 @@ function w2p_encrypt($data)
         if (!defined('W2P_ENCRYPTION_KEY')) {
             secret_key_init();
             if (!defined('W2P_ENCRYPTION_KEY')) {
-                throw new Throwable('Encryption key not defined.');
+                throw new Exception('Encryption key not defined.');
             }
         }
 
         // Conversion de la clé hexadécimale en binaire
         $key = hex2bin(W2P_ENCRYPTION_KEY);
         if (strlen($key) !== 32) {
-            throw new Throwable('Invalid encryption key length. Key must be 32 bytes for AES-256-CBC.');
+            throw new Exception('Invalid encryption key length. Key must be 32 bytes for AES-256-CBC.');
         }
 
         $iv = openssl_random_pseudo_bytes(16); // Génère un IV de 16 octets
         $encrypted_data = openssl_encrypt($data, 'aes-256-cbc', $key, 0, $iv);
 
         if ($encrypted_data === false) {
-            throw new Throwable('Encryption failed.');
+            throw new Exception('Encryption failed.');
         }
 
         return base64_encode($iv . $encrypted_data); // Combine IV et données chiffrées
@@ -366,20 +366,20 @@ function w2p_decrypt($encrypted_data)
         if (!defined('W2P_ENCRYPTION_KEY')) {
             secret_key_init();
             if (!defined('W2P_ENCRYPTION_KEY')) {
-                throw new Throwable('Encryption key not defined.');
+                throw new Exception('Encryption key not defined.');
             }
         }
 
         // Conversion de la clé hexadécimale en binaire
         $key = hex2bin(W2P_ENCRYPTION_KEY);
         if (strlen($key) !== 32) {
-            throw new Throwable('Invalid encryption key length. Key must be 32 bytes for AES-256-CBC.');
+            throw new Exception('Invalid encryption key length. Key must be 32 bytes for AES-256-CBC.');
         }
 
         $encrypted_data = base64_decode($encrypted_data);
 
         if (strlen($encrypted_data) < 16) {
-            throw new Throwable('Encrypted data is too short to contain a valid IV.');
+            throw new Exception('Encrypted data is too short to contain a valid IV.');
         }
 
         $iv = substr($encrypted_data, 0, 16); // Extract IV
@@ -388,7 +388,7 @@ function w2p_decrypt($encrypted_data)
         $decrypted_data = openssl_decrypt($encrypted_data, 'aes-256-cbc', $key, 0, $iv);
 
         if ($decrypted_data === false) {
-            throw new Throwable('Decryption failed.');
+            throw new Exception('Decryption failed.');
         }
 
         return $decrypted_data;

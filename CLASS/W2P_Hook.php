@@ -26,6 +26,7 @@ class W2P_Hook
     {
         try {
             $formated_hook = [];
+            $formated_hook["fields"] = [];
             foreach ($this->hook_from_parameters["fields"] as $field) {
                 $formated_field = $this->w2p_format_hook_field($field);
                 if ($formated_field) {
@@ -102,6 +103,7 @@ class W2P_Hook
             $last_query_payload = $last_query_data["payload"];
             unset($last_query_payload['data']);
             if (
+                isset($last_query_payload['fields']) &&
                 $last_query_payload['fields'] == $formated_hook["fields"]
                 && $last_query_payload['products'] == $formated_hook["products"]
             ) {

@@ -2,11 +2,7 @@
 
 
 if (!defined("W2P_DISTANT_REST_URL")) {
-    if (w2p_is_local_environment()) {
-        define("W2P_DISTANT_REST_URL", "http://localhost:3000/api/v1");
-    } else {
-        define("W2P_DISTANT_REST_URL", "https://w2p-website.vercel.app/api/v1");
-    }
+    define("W2P_DISTANT_REST_URL", "https://woocommerce-to-pipedrive.com/api/v1");
 }
 
 if (!defined("W2P_VARIABLE_SOURCES")) {
@@ -754,7 +750,7 @@ if (!defined("W2P_HOOK_LIST")) {
                 "key" => "woocommerce_cart_updated",
                 "description" => "Fired when a product is added, removed or updated to the shopping cart.",
                 "disabledFor" => [],
-                "source" => "product",
+                "source" => "order",
             ],
             [
                 "label" => "New Order",
@@ -819,6 +815,17 @@ if (!defined("W2P_HOOK_LIST")) {
                 "disabledFor" => [],
                 "source" => "order",
             ]
+        ]
+    );
+}
+
+if (!defined("W2P_HOOK_PRIORITY")) {
+    define(
+        "W2P_HOOK_PRIORITY",
+        [
+            'organization' => 100,
+            'person'       => 105,
+            'deal'         => 110,
         ]
     );
 }

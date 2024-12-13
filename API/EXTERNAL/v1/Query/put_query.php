@@ -54,7 +54,7 @@ function w2p_ext_put_query($request)
             if ($traceback && is_array($traceback)) {
                 foreach ($traceback as $event) {
                     if (isset($event['step']) && isset($event["success"])) {
-                        $date = isset($event["createdAt"]) ? date("Y-m-d\TH:i:sP", strtotime($event["createdAt"])) : null;
+                        $date = isset($event["createdAt"]) ? gmdate("Y-m-d\TH:i:s\Z", strtotime($event["createdAt"])) : null;
 
                         $query->add_traceback(
                             $event['step'],

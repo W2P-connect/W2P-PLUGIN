@@ -1,15 +1,15 @@
 <?php
 
 /**
- * @package First_Plugin
- * @version 1.0.0
+ * @package W2P
+ * @version 1.0.1
  */
 /*
 Plugin Name: W2P - Woocomerce to Pipedrive
 Plugin URI: https://woocommerce-to-pipedrive.com/
 Description: Permet de syncroniser unidirectionnelement vos informations CRM de Woocommerce à Pipedrive
 Author: Tristan Dieny
-Version: 1.0
+Version: 1.0.1
 Author URI: https://github.com/W2P-connect/W2P-PLUGIN
 Requires PHP: 8.0
 */
@@ -79,7 +79,10 @@ function w2p_show_front_app($atts = array(), $content = null, $tag = 'example_re
     $js_files = glob(plugin_dir_path(__FILE__) . 'REACT/build/static/js/main.*.js');
     if (!empty($js_files)) {
         wp_enqueue_script('w2p-app', plugins_url('REACT/build/static/js/' . basename($js_files[0]), __FILE__) . "?ver=" . mt_rand(0, 100), array('wp-element'), time(), true);
+    } else {
+        w2p_add_error_log('React JS file not found in ' . print_r(plugin_dir_path(__FILE__) . 'REACT/build/static/js/main.*.js', true), "w2p_show_front_app");
     }
+
 
     wp_localize_script('w2p-app', 'appGlobalData', $appGlobalData);
 
@@ -214,24 +217,22 @@ register_activation_hook(__FILE__, 'w2p_init_plugin');
 
 function secret_key_init()
 {
-
     if (defined('W2P_ENCRYPTION_KEY')) {
         return;
     }
 
     $encryption_key = w2p_generate_encryption_key();
-
-    // Fichier wp-config.php
     $config_file = ABSPATH . 'wp-config.php';
 
     if (file_exists($config_file) && is_writable($config_file)) {
         $config_content = file_get_contents($config_file);
         if (strpos($config_content, 'W2P_ENCRYPTION_KEY') === false) {
             $key_definition = "\ndefine('W2P_ENCRYPTION_KEY', '$encryption_key');\n";
-            $marker = "/* That's all, stop editing! Happy publishing. */";
+            $marker = "/* That's all, stop editing!";
+            $marker_pos = strpos($config_content, $marker);
 
-            if (strpos($config_content, $marker) !== false) {
-                $new_content = str_replace($marker, $key_definition . $marker, $config_content);
+            if ($marker_pos !== false) {
+                $new_content = substr_replace($config_content, $key_definition, $marker_pos, 0);
             } else {
                 $new_content = $config_content . $key_definition;
             }
