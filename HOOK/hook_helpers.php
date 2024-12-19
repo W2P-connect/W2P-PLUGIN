@@ -523,22 +523,21 @@ function w2p_handle_cart_updated($hook, $order_id)
         $iteration = did_action("woocommerce_update_order");
         set_transient("last_iteration_fired_woocommerce_update_order_from_card_$order_id", $iteration, 10);
 
-        w2p_create_or_update_order_from_api(); //forcing update order at the end
+        w2p_create_draft_order(); //forcing update order at the end
         add_action("wp_footer", function () {
-            w2p_create_or_update_order_from_api(); //forcing update order at the end
+            w2p_create_draft_order(); //forcing update order at the end
         });
 
         if (!wp_next_scheduled('w2p_check_last_woocommerce_update_order', array($hook, $order_id, $iteration))) {
-            wp_schedule_single_event(
+            $scheduled = wp_schedule_single_event(
                 time() + 2,
                 'w2p_check_last_woocommerce_update_order',
                 array($hook, $order_id, $iteration)
             );
-        }
 
-        $next_event = wp_get_scheduled_event('w2p_check_last_woocommerce_update_order', array($hook, $order_id, $iteration));
-        if (!$next_event) {
-            w2p_add_error_log("No scheduled event for w2p_check_last_woocommerce_update_order", "w2p_handle_cart_updated");
+            if (!$scheduled) {
+                w2p_add_error_log("Failed to schedule event for w2p_check_last_woocommerce_update_order", "w2p_handle_cart_updated");
+            }
         }
     } catch (Throwable $e) {
         w2p_add_error_log("Error in handling cart update: " . $e->getMessage(), "w2p_handle_cart_updated");
@@ -547,7 +546,7 @@ function w2p_handle_cart_updated($hook, $order_id)
 }
 
 
-function w2p_create_or_update_order_from_api()
+function w2p_create_draft_order()
 {
     try {
         $order_id = null;
@@ -560,10 +559,6 @@ function w2p_create_or_update_order_from_api()
             w2p_add_error_log('Error API : ' . $response->get_error_message(), "w2p_create_order_from_api");
             return null;
         }
-
-        // $response_log = substr(json_encode($response, JSON_PRETTY_PRINT | JSON_PARTIAL_OUTPUT_ON_ERROR), 0, 2000);
-        // w2p_add_error_log('Raw response (truncated): ' . $response_log, "w2p_create_order_from_api");
-
 
         if (method_exists($response, 'get_data')) {
             $data = $response->get_data();
@@ -584,16 +579,23 @@ function w2p_create_or_update_order_from_api()
 }
 
 
-
 function w2p_get_current_checkout_order_id()
 {
     try {
         if (get_current_user_id()) {
-            $order_id = WC()->session->get("store_api_draft_order");
-            // $order_id = null;
+            $order_id = WC()->session->get('store_api_draft_order');
+
             if (!$order_id) {
-                $order_id = w2p_create_or_update_order_from_api();
+                $order_id = w2p_get_current_draft_order_id();
+                if ($order_id) {
+                    WC()->session->set('store_api_draft_order', $order_id);
+                    return $order_id;
+                }
+                if (!$order_id) {
+                    $order_id = w2p_create_draft_order();
+                }
             }
+
             return $order_id;
         } else {
             return null;
@@ -603,5 +605,28 @@ function w2p_get_current_checkout_order_id()
         return null;
     }
 }
+
+function w2p_get_current_draft_order_id()
+{
+    if (!get_current_user_id()) {
+        return null;
+    }
+
+    $customer = new WC_Customer(get_current_user_id());
+    $last_order = $customer->get_last_order();
+
+    if (!$last_order) {
+        return null;
+    }
+
+    $order_data = $last_order->get_data();
+    $order_status = isset($order_data['status']) ? $order_data['status'] : null;
+
+    if (in_array($order_status, array('draft', 'checkout-draft'))) {
+        return $last_order->get_id();
+    }
+    return null;
+}
+
 
 w2p_register_user_defined_hooks();

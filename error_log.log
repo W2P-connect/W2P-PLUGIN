@@ -1,0 +1,38 @@
+2024-12-15T20:30:08Z[w2p_handle_custom_hook] - Hook woocommerce_after_cart_item_quantity_update (category: deal) triggered for source: 145 (source: order), user: 0
+2024-12-15T20:30:08Z[w2p_get_current_checkout_order_id] - store_api_draft_order: 145
+2024-12-15T20:32:32Z[w2p_send_queries] - Cron executed for organization
+2024-12-15T20:32:32Z[w2p_send_queries] - Cron executed for person
+2024-12-15T20:32:36Z[w2p_send_queries] - Cron executed for deal
+2024-12-15T20:32:36Z[w2p_send_queries] - Cron executed for 2 queries ! - success:  2 | error: 0
+2024-12-15T20:32:54Z[w2p_handle_custom_hook] - Hook wp_login (category: person) triggered for source: 13 (source: user), user: 0
+2024-12-15T20:33:06Z[w2p_get_current_checkout_order_id] - store_api_draft_order: 
+2024-12-15T20:33:06Z[w2p_get_current_checkout_order_id] - w2p_get_current_draft_order_id: 
+2024-12-15T20:33:06Z[w2p_handle_custom_hook] - Hook woocommerce_new_order (category: deal) triggered for source: 146 (source: order), user: 13
+2024-12-15T20:33:06Z[w2p_handle_custom_hook] - Hook woocommerce_update_order (category: deal) triggered for source: 146 (source: order), user: 13
+2024-12-15T20:33:06Z[w2p_get_current_checkout_order_id] - w2p_create_draft_order: 146
+2024-12-15T20:34:26Z[w2p_get_current_checkout_order_id] - store_api_draft_order: 146
+2024-12-15T20:34:34Z[w2p_handle_custom_hook] - Hook woocommerce_after_cart_item_quantity_update (category: deal) triggered for source: 146 (source: order), user: 0
+2024-12-15T20:35:40Z[w2p_handle_custom_hook] - Hook wp_login (category: person) triggered for source: 3 (source: user), user: 0
+2024-12-15T20:35:46Z[w2p_get_current_checkout_order_id] - store_api_draft_order: 
+2024-12-15T20:35:46Z[w2p_get_current_draft_order_id] - Last order is not a draft. Order ID: 106, Status: cancelled
+2024-12-15T20:35:46Z[w2p_get_current_checkout_order_id] - w2p_get_current_draft_order_id: 
+2024-12-15T20:37:21Z[w2p_send_queries] - Cron executed for organization
+2024-12-15T20:37:25Z[w2p_send_queries] - Cron executed for person
+2024-12-15T20:37:32Z[w2p_send_queries] - Cron executed for deal
+2024-12-15T20:37:32Z[w2p_send_queries] - Cron executed for 6 queries ! - success:  6 | error: 0
+2024-12-16T07:51:13Z[w2p_send_queries] - Cron executed for organization
+2024-12-16T07:51:13Z[w2p_send_queries] - Cron executed for person
+2024-12-16T07:51:15Z[w2p_send_queries] - Cron executed for deal
+2024-12-16T07:51:15Z[w2p_send_queries] - Cron executed for 1 queries ! - success:  1 | error: 0
+2024-12-16T07:52:13Z[w2p_send_queries] - Cron executed for organization
+2024-12-16T07:52:13Z[w2p_send_queries] - Cron executed for person
+2024-12-16T07:52:13Z[w2p_send_queries] - Cron executed for deal
+2024-12-16T07:52:13Z[w2p_send_queries] - Cron executed for 1 queries ! - success:  0 | error: 1
+2024-12-16T07:58:16Z[w2p_send_queries] - Cron executed for organization
+2024-12-16T07:58:16Z[w2p_send_queries] - Cron executed for person
+2024-12-16T07:58:17Z[w2p_send_queries] - Cron executed for deal
+2024-12-16T07:58:17Z[w2p_send_queries] - Cron executed for 1 queries ! - success:  1 | error: 0
+2024-12-16T14:11:40Z[w2p_send_queries] - Cron executed for organization
+2024-12-16T14:11:40Z[w2p_send_queries] - Cron executed for person
+2024-12-16T14:11:41Z[w2p_send_queries] - Cron executed for deal
+2024-12-16T14:11:41Z[w2p_send_queries] - Cron executed for 1 queries ! - success:  1 | error: 0

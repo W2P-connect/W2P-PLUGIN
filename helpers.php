@@ -186,7 +186,7 @@ function w2p_add_error_log(string $message = 'No message', string $function = ''
         }
         $log_entry = gmdate("Y-m-d\TH:i:s\Z");
         if ($function) {
-            $log_entry .= "[$function] -";
+            $log_entry .= " [$function] -";
         }
         $log_entry .= " $message\n";
         error_log($log_entry, 3, $log_file);
